@@ -21,6 +21,21 @@ func newCronJobView(t string, app *appView, list resource.List) resourceViewer {
 	return &v
 }
 
+func (v *cronJobView) suspend(evt *tcell.EventKey) *tcell.EventKey {
+	if !v.rowSelected() {
+		return evt
+	}
+
+	v.app.flash(flashInfo, fmt.Sprintf("Suspending %s %s", v.list.GetName(), v.selectedItem))
+
+	if err := v.list.Resource().(resource.Runner).Run(v.selectedItem); err != nil {
+
+		v.app.flash(flashErr, "Boom - suspend!", err.Error())
+		return evt
+	}
+
+	return nil
+}
 func (v *cronJobView) trigger(evt *tcell.EventKey) *tcell.EventKey {
 	if !v.rowSelected() {
 		return evt
@@ -37,4 +52,5 @@ func (v *cronJobView) trigger(evt *tcell.EventKey) *tcell.EventKey {
 
 func (v *cronJobView) extraActions(aa keyActions) {
 	aa[tcell.KeyCtrlT] = newKeyAction("Trigger", v.trigger, true)
+	aa[tcell.KeyCtrlU] = newKeyAction("Suspend", v.suspend, true)
 }
