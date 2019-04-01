@@ -23,7 +23,9 @@ const (
 )
 
 var (
-	version, commit, date = "dev", "dev", "n/a"
+	// Make a custom version for use on our project.
+	//
+	version, commit, date = "0.4.3.1", "icp", "n/a"
 	refreshRate           int
 	logLevel              string
 	k8sFlags              *genericclioptions.ConfigFlags

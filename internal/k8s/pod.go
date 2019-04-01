@@ -4,6 +4,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	restclient "k8s.io/client-go/rest"
+	"strings"
 )
 
 const defaultKillGrace int64 = 5
@@ -54,11 +55,13 @@ func (p *Pod) Containers(ns, n string, includeInit bool) ([]string, error) {
 	}
 
 	cc := []string{}
-	if includeInit {
-		for _, c := range po.Spec.InitContainers {
-			cc = append(cc, c.Name)
-		}
-	}
+
+	// Let's not include initContainers
+	//if includeInit {
+	//	for _, c := range po.Spec.InitContainers {
+	//		cc = append(cc, c.Name)
+	//	}
+	//}
 	for _, c := range po.Spec.Containers {
 		cc = append(cc, c.Name)
 	}
@@ -68,10 +71,17 @@ func (p *Pod) Containers(ns, n string, includeInit bool) ([]string, error) {
 
 // Logs fetch container logs for a given pod and container.
 func (p *Pod) Logs(ns, n, co string, lines int64, prev bool) *restclient.Request {
+        // For containers that start with "icp-" add timestamps.
+        //
+        var value = false;
+        if (strings.HasPrefix(co, "icp-")) {
+          value = true
+        }
 	return p.DialOrDie().CoreV1().Pods(ns).GetLogs(n, &v1.PodLogOptions{
 		Container: co,
 		Follow:    true,
 		TailLines: &lines,
+		Timestamps: value,
 		Previous:  prev,
 	})
 }
