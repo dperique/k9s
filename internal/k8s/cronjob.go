@@ -43,6 +43,20 @@ func (c *CronJob) Delete(ns, n string) error {
 	return c.DialOrDie().BatchV1beta1().CronJobs(ns).Delete(n, nil)
 }
 
+// Suspend the cronjob.
+func (c *CronJob) Suspend(ns, n string) error {
+	cj, err := c.Get(ns, n)
+	if err != nil {
+		return err
+	}
+	cronJob := cj.(*batchv1beta1.CronJob)
+
+	cronjob.Spec.Suspend = true;
+	_, err = c.DialOrDie().BatchV1().Jobs(ns).Update(cronjob)
+	return err
+}
+}
+
 // Run the job associated with this cronjob.
 func (c *CronJob) Run(ns, n string) error {
 	cj, err := c.Get(ns, n)

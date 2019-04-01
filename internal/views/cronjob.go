@@ -28,7 +28,7 @@ func (v *cronJobView) suspend(evt *tcell.EventKey) *tcell.EventKey {
 
 	v.app.flash(flashInfo, fmt.Sprintf("Suspending %s %s", v.list.GetName(), v.selectedItem))
 
-	if err := v.list.Resource().(resource.Runner).Run(v.selectedItem); err != nil {
+	if err := v.list.Resource().(resource.Runner).Suspend(v.selectedItem); err != nil {
 
 		v.app.flash(flashErr, "Boom - suspend!", err.Error())
 		return evt
