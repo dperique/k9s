@@ -71,10 +71,10 @@ func (p *Pod) Containers(ns, n string, includeInit bool) ([]string, error) {
 
 // Logs fetch container logs for a given pod and container.
 func (p *Pod) Logs(ns, n, co string, lines int64, prev bool) *restclient.Request {
-        // For containers that start with "icp-" add timestamps.
+        // For containers that start with "icp-" or "mysql-" add timestamps.
         //
         var value = false;
-        if (strings.HasPrefix(co, "icp-")) {
+        if (strings.HasPrefix(co, "icp-") || strings.HasPrefix(co, "mysql-")) {
           value = true
         }
 	return p.DialOrDie().CoreV1().Pods(ns).GetLogs(n, &v1.PodLogOptions{
