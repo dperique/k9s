@@ -1,6 +1,8 @@
 package views
 
 import (
+	"strings"
+
 	"github.com/derailed/k9s/internal/k8s"
 	"github.com/derailed/k9s/internal/resource"
 	"github.com/derailed/tview"
@@ -93,8 +95,17 @@ func (v *clusterInfoView) refresh() {
 
 	mx := v.cluster.Metrics(nodes, mxNodes)
 	c := v.GetCell(row, 1)
-	c.SetText(deltas(c.Text, toPerc(mx.PercCPU)))
+	cpu := toPerc(mx.PercCPU)
+	c.SetText(cpu + deltas(strip(c.Text), cpu))
 	row++
+
 	c = v.GetCell(row, 1)
-	c.SetText(deltas(c.Text, toPerc(mx.PercMEM)))
+	mem := toPerc(mx.PercMEM)
+	c.SetText(mem + deltas(strip(c.Text), mem))
+}
+
+func strip(s string) string {
+	t := strings.Replace(s, plus(), "", 1)
+	t = strings.Replace(t, minus(), "", 1)
+	return t
 }
